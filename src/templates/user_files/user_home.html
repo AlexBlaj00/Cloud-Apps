@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type= "text/css" href="../static/styles/index.css">
+    <link rel="stylesheet" type= "text/css" href="../static/styles/index_bg.css">
+    <link rel="stylesheet" type= "text/css" href="../static/styles/home.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet'>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <script type="text/javascript" src="../../static/scripts/index.js"></script>
+  </head>
+
+  <body>
+
+    <div class="topnav" id="myTopnav">
+
+      <div class="dropdown">
+        <button class="dropbtn">Profile  
+          <i class="fa fa-caret-down" style="text-align: right;"></i>  
+        </button>
+
+        <div class="dropdown-content">
+          <a href="/user_settings" target="_self">Settings</a>
+          <a href="/user_contact" target="_self">Contact</a>
+          <a href="/logout" target="_self">Log Out</a>
+
+        </div>
+      </div>
+      <a href="/user_home" class="homebtn" target="_self">Home</a>
+    </div>
+    <div id="side_menu" class="sidebar">
+      <a href="javascript:void(0)" class="closebtn" onclick="close_menu()">×</a>
+      <img src="../../static/img/logo_transparent.png" class="img-logo">
+      <a href="/user_home" target="_self">Apps</a>
+      <a href="/user_groups" target="_self">Groups</a>
+      <!--
+      <a href="user_msg" target="_self">Messages</a>
+      -->
+      <a href="user_forum" target="_self">Frequent Questions</a>
+    </div>
+
+
+    <div id="main">
+      <button class="open_btn" onclick="open_menu()">☰</button>
+      <div class="main-container">
+        <h2>Applications view</h2>
+        <p>List of the accessible applications and the associated permissions.</p>
+        
+             <div class="table-responsive">
+              <table class="table table-bordered table-hover" style="border:1px solid #dee2e6 !important;">
+                <thead class="thead-info">
+                  <tr>
+                    <th scope="col" style="text-align: center; vertical-align: middle; border:1px solid #dee2e6 !important;">App Name</th>
+                    <th scope="col" style="border:1px solid #dee2e6 !important;">Permission name</th>
+                    <th scope="col" style="border:1px solid #dee2e6 !important;">Permission description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% if app_perms_list|length %}
+                    {% for app, perms in app_perms_list.items() %}
+                    <tr>
+                      <td scope="row" rowspan="{{ perms|length + 1}}" style="text-align: center; vertical-align: middle;">{{ app }}</td>
+                     
+                      {% for p in perms %}
+                      <tr>
+                        <td scope="row">{{ p[1] }}</td>
+                        <td scope="row">{{ p[2] }}</td>
+                      </tr>
+                      {% endfor %}
+                    
+                    </tr>
+                    {% endfor %}
+                  
+                  {% else %}
+                  <tr>
+                    <td colspan="2">There are no apps!</td>
+                  </tr>
+                  {% endif %}
+                </tbody>
+              </table>
+            </div>
+        
+      </div>
+    </div>
+
+  </body>
+</html>

@@ -1,0 +1,112 @@
+# Parola e: 'cvscvs' pentru toti userii
+
+Insert into test.users(username,password,full_name,email,phone_number, is_admin) values ("ovi", "$5$rounds=535000$LoMOqM6Qy5BRSVtK$oxGFftJds1oUIgmwiyZmbwmrytNjE9JRb5ygeq.CXM5", "Ovi Pro",
+"ovi.pro@yahoo.com", "0773978453", 1);
+
+Insert into test.users(username,password,full_name,email,phone_number, is_admin) values ("mario", "$5$rounds=535000$LoMOqM6Qy5BRSVtK$oxGFftJds1oUIgmwiyZmbwmrytNjE9JRb5ygeq.CXM5", "Mario Stuart",
+"mario.stuart@yahoo.com", "0773324313", 0);
+
+Insert into test.users(username,password,full_name,email,phone_number, is_admin) values ("andrei", "$5$rounds=535000$LoMOqM6Qy5BRSVtK$oxGFftJds1oUIgmwiyZmbwmrytNjE9JRb5ygeq.CXM5", "Andrei Milano",
+"andrei@yahoo.com", "0723224313", 1);
+
+Insert into test.users(username,password,full_name,email,phone_number, is_admin) values ("ion", "$5$rounds=535000$LoMOqM6Qy5BRSVtK$oxGFftJds1oUIgmwiyZmbwmrytNjE9JRb5ygeq.CXM5", "Ion Vesa",
+"ion_vesa@yahooss.com", "0723446313", 0);
+
+Insert into test.users(username,password,full_name,email,phone_number, is_admin) values ("george", "$5$rounds=535000$LoMOqM6Qy5BRSVtK$oxGFftJds1oUIgmwiyZmbwmrytNjE9JRb5ygeq.CXM5", "George Vesa",
+"g_vesa@yahooss.com", "0767446313", 1);
+
+Insert into test.users(username,password,full_name,email,phone_number, is_admin) values ("andi", "$5$rounds=535000$LoMOqM6Qy5BRSVtK$oxGFftJds1oUIgmwiyZmbwmrytNjE9JRb5ygeq.CXM5", "Andi Popescu",
+"andi_pop@yahooss.com", "0790046313", 0);
+
+
+Insert into test.groups(name,description) values ("Pesti", "Aici putem vedea pesti"); # User + Admin
+Insert into test.groups(name,description) values ("Google", "Search on Google"); # Admin
+
+
+Insert into test.permissions(name,description) values ("Pesti-vizualizare","Acest user poate vizualiza"); # User + Admin
+Insert into test.permissions(name,description) values ("Pesti-editare","Acest user poate edita"); # User + Admin
+Insert into test.permissions(name,description) values ("Pesti-Stergere","Acest user poate sterge"); # User + Admin
+Insert into test.permissions(name,description) values ("Cautare-Google","Acest user poate cauta pe google"); # Admin
+
+Insert into test.user_groups_relation(user_id,group_id) values (1,1); # Il adaug pe user-ul ovi in Grupul Pesti(User + Admin)
+Insert into test.user_groups_relation(user_id,group_id) values (1,2); # Il adaug pe user-ul ovi in Grupul Google(Admin)
+
+Insert into test.user_groups_relation(user_id,group_id) values (2,1); # Il adaug pe user-ul mario in Grupul Pesti(User + Admin), deoarece este doar user
+
+Insert into test.user_groups_relation(user_id,group_id) values (3,1); # Il adaug pe user-ul andrei in Grupul Pesti(User + Admin)
+Insert into test.user_groups_relation(user_id,group_id) values (3,2); # Il adaug pe user-ul andrei in Grupul Google(Admin)
+
+Insert into test.user_groups_relation(user_id,group_id) values (4,1); # Il adaug pe user-ul ion in Grupul Pesti(User + Admin), deoarece este doar user
+
+Insert into test.user_groups_relation(user_id,group_id) values (5,1); # Il adaug pe user-ul george in Grupul Pesti(User + Admin)
+Insert into test.user_groups_relation(user_id,group_id) values (5,2); # Il adaug pe user-ul george in Grupul Google(Admin)
+
+Insert into test.user_groups_relation(user_id,group_id) values (6,1); # Il adaug pe user-ul andi in Grupul Pesti(User + Admin), deoarece este doar user
+
+
+Insert into test.groups_perm_relation(group_id,perm_id) values (1,1); # Adaug permisiunea Pesti-vizualizare in grupul Pesti
+Insert into test.groups_perm_relation(group_id,perm_id) values (1,2); # Adaug permisiunea Pesti-editare in grupul Pesti
+Insert into test.groups_perm_relation(group_id,perm_id) values (1,3); # Adaug permisiunea Pesti-stergere in grupul Pesti
+
+
+Insert into test.groups_perm_relation(group_id,perm_id) values (2,4); # Adaug permisiunea Cautare-Google in grupul Google
+
+SELECT 
+    p.name
+FROM
+    permissions p
+        INNER JOIN
+    (SELECT 
+        gp.perm_id_1, gp.perm_id_2, gp.perm_id_3
+    FROM
+        user_groups_relation ug
+    INNER JOIN users u ON u.id = ug.user_id
+    INNER JOIN groups_perm_relation gp ON ug.group_id_1 = gp.group_id) temp ON p.id = temp.perm_id_3;
+    
+SELECT 
+    p.name
+FROM
+    permissions p,
+        
+    (SELECT 
+        gp.perm_id_1, gp.perm_id_2, gp.perm_id_3
+    FROM
+        user_groups_relation ug
+    INNER JOIN users u ON u.id = ug.user_id
+    INNER JOIN groups_perm_relation gp ON ug.group_id_1 = gp.group_id) a where a.;
+
+# Select grupuri pentru un utilizator anume
+SELECT g.name FROM groups g,
+(
+	SELECT ug.group_id_1, ug.group_id_2, ug.group_id_3 FROM user_groups_relation ug
+	INNER JOIN users u ON u.id = ug.user_id
+	WHERE u.username = 'ovi'
+) result
+WHERE g.id = result.group_id_1 OR g.id = result.group_id_2 OR g.id = result.group_id_3;
+    
+SELECT 
+    p.name
+FROM
+    permissions p,
+        
+    (SELECT 
+        gp.perm_id_1 , gp.perm_id_2, gp.perm_id_3
+    FROM
+        user_groups_relation ug
+    INNER JOIN users u ON u.id = ug.user_id
+    INNER JOIN groups_perm_relation gp ON ug.group_id_1 = gp.group_id) a where a.perm_id_1 = p.id or a.perm_id_2 = p.id or a.perm_id_3 = p.id ;
+    
+
+
+    
+ALTER TABLE groups_perm_relation
+ADD COLUMN perm_id_4 INT(11) AFTER perm_id_3;
+
+ALTER TABLE groups_perm_relation
+DROP COLUMN perm_id_4;
+
+UPDATE groups_perm_relation 
+SET 
+    perm_id_4 = 4
+WHERE
+    id = 1;

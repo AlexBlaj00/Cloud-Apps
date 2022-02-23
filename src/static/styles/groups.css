@@ -1,0 +1,57 @@
+/*
+table {
+    border-collapse: collapse;
+    border: 2.5px solid lightgray;
+	font-size: 18px;
+	text-align: center;
+}
+
+th {
+    padding: 5px 15px 5px 15px;
+	width: 250px !important;
+    border-collapse: collapse;
+    border: 2.5px solid lightgray;
+	color: darkslategray;
+	background-color: #36a9ab;
+}
+
+tr {
+	height: 75px !important;
+    border-collapse: collapse;
+    border: 2.5px solid lightgray;
+}
+
+td {
+    padding: 5px 40px 5px 40px;
+	width: 250px !important;
+    border-collapse: collapse;
+    border: 2.5px solid lightgray;
+	color: darkslategray;
+	background-color: #E0F5F5;
+}
+*/
+.request_link {
+	font-size: 18px;
+	color: darkslategray;
+	background: none;
+	border: none;
+	padding: 10px;
+	text-decoration: none !important;
+}
+
+.request_link:hover {
+	background-color: #36a9ab;
+}
+
+.request_link:active, .request_link:visited {
+	text-decoration: none;
+}
+
+.card {
+    background: #272E48;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    border: 0;
+    margin-bottom: 1rem;
+}

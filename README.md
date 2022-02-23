@@ -1,7 +1,7 @@
 # Multi container application for cloud agnostic deployment
 Create multi container application basesd on microservices, AWS, dockers. In the end, we will prove the deployment of application.
 
-Some usefull links:
+Some useful links:
 
     https://docs.docker.com/engine/reference/builder/
     https://docs.docker.com/compose/compose-file/compose-file-v3/

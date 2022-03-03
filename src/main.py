@@ -1,6 +1,5 @@
-from flask import Flask, jsonify
 import requests
-from flask import Flask, flash, redirect, render_template, request, session, abort, flash, url_for, request
+from flask import Flask, flash, redirect, render_template, request, session, abort, flash, url_for, request, jsonify
 from passlib.hash import sha256_crypt
 import mysql.connector as mariadb
 import os

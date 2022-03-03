@@ -50,8 +50,8 @@ def admin_home_run():
         # get all the permissions for this user based on the groups that 
         # the user is a part of
         cur.execute(queries[0])
-        permissions = cur.fetchall()
-
+        permissions = cur.fetchall()    
+        
         # store the distinct app ids
         app_ids = []
 

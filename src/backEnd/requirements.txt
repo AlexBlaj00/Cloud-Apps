@@ -1,0 +1,7 @@
+Flask
+mysql
+passlib
+mariadb
+flask_restful
+libmariadbclient-dev
+libmysqlclient-dev

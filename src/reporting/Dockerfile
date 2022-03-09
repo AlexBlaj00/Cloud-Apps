@@ -1,8 +1,8 @@
 FROM python
 
-WORKDIR /db
+WORKDIR /reporting
 
-COPY . /db
+COPY . /reporting
 
 COPY requirements.txt .
 

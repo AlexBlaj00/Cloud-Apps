@@ -32,7 +32,6 @@ def do_dasboard_apps():
         cur = conn.cursor(buffered = True)
         cur.execute(apps)
         apps = cur.fetchall()
-        #print(apps)
     except mariadb.Error as error:
             print("Failed to read data from table", error)
     finally:
@@ -50,7 +49,6 @@ def do_dasboard_apps():
             else:
                 valuesApps.append(el)
             
-    print("{} {}".format(applications, valuesApps))
 
     fig = go.Figure(data=[go.Pie(labels=applications, values = valuesApps)])
 

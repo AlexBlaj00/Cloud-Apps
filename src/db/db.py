@@ -14,8 +14,6 @@ DB_DATABASE = 'sky_security'
 DB_PORT = 3306
 
 
-
-
 @app.route('/getUsers', methods = ['GET'])
 def getUsr():
     conn = mariadb.connect(host=DB_HOST, port=int(DB_PORT), user=DB_USER, 

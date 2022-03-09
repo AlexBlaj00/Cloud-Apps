@@ -14,6 +14,7 @@ DB_PASSWORD = 'h^g8p{66TgW'
 DB_DATABASE = 'sky_security'
 DB_PORT = 3306
 
+#==============================================================================#
 @app.route('/admin_home')
 def admin_home_run():
    # if the user is not logged in, redirect him/her to the login page
@@ -120,7 +121,7 @@ def form_delete_id_string(delete, is_form):
     return ids_string
 
 
-
+#==============================================================================#
 @app.route('/admin_groups')
 def admin_groups_run():
     # if the user is not logged in, redirect him/her to the login page
@@ -184,7 +185,30 @@ def is_group_in_list(admin_groups, group):
             return True
     return False
 
+#==============================================================================#
+@app.route('/admin_add')
+def admin_add_run():
+    # if the user is not logged in, redirect him/her to the login page
+    is_logged_in()
+
+    return render_template('admin_files/admin_add_user.html') 
+
+#==============================================================================#
+###
+# Redirect the user to the login page if it's not logged in
+###
+def is_logged_in():
+    # if the user is not logged in, redirect him/her to the login page
+    if not session.get('logged_in'):
+        return render_template('common_files/login.html')
+
+#==============================================================================#
+
+@app.route('/', methods=['GET'])
+def serve():
+    return "yoyo", 200
+
 
 if __name__ == "__main__":
   app.secret_key = os.urandom(12)
-  app.run(debug=True, host='0.0.0.0', port=5002)
+  app.run(debug=True, host='0.0.0.0', port=5000)

@@ -15,8 +15,8 @@ DB_DATABASE = 'sky_security'
 DB_PORT = 3306
 
 #==============================================================================#
-@app.route('/admin_home')
-def admin_home_run():
+@app.route('/admin_home/<int:user_id>')
+def admin_home_run(user_id):
    # if the user is not logged in, redirect him/her to the login page
     #is_logged_in()
 
@@ -33,7 +33,7 @@ def admin_home_run():
         "WHERE gp.group_id IN ( "
         "SELECT g.id FROM groups g "
         "INNER JOIN user_groups_relation ug ON ug.group_id = g.id "
-        "WHERE ug.user_id = 1"  + ");")
+        "WHERE ug.user_id = " +str(user_id)  + ");")
 
     # database connection 
     conn = mariadb.connect(host=DB_HOST, port=int(DB_PORT), user=DB_USER, 
@@ -122,8 +122,8 @@ def form_delete_id_string(delete, is_form):
 
 
 #==============================================================================#
-@app.route('/admin_groups')
-def admin_groups_run():
+@app.route('/admin_groups/<int:user_id>')
+def admin_groups_run(user_id):
     # if the user is not logged in, redirect him/her to the login page
     #is_logged_in()
 
@@ -135,7 +135,7 @@ def admin_groups_run():
     queries.append(
         "SELECT g.name FROM groups g "
         "INNER JOIN user_groups_relation ug ON ug.group_id = g.id "
-        "WHERE ug.user_id = 1" + ";")
+        "WHERE ug.user_id = " + str(user_id) + ";")
 
     # database connection to get the groups
     conn = mariadb.connect(host=DB_HOST, port=int(DB_PORT), user=DB_USER, 

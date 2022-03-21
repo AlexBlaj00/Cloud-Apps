@@ -17,7 +17,7 @@ import pandas as pd
 import json
 import plotly.express as px
 import pandas as pd
-
+from services import adminServices
 UPLOAD_FOLDER = 'static/files/'
 app.config['UPLOAD_FOLDER'] =  UPLOAD_FOLDER
 
@@ -111,47 +111,31 @@ def admin_home_run():
 def admin_groups_run():
     # if the user is not logged in, redirect him/her to the login page
     is_logged_in()
-
-    # list of queries
-    queries = []
-    # get all the groups 
-    queries.append("SELECT name FROM groups;")
-    # create query to get the groups that the current user is a part of
-    queries.append(
-        "SELECT g.name FROM groups g "
-        "INNER JOIN user_groups_relation ug ON ug.group_id = g.id "
-        "WHERE ug.user_id = " + str(user_id[0]) + ";")
-
-    # database connection to get the groups
-    conn = mariadb.connect(host=DB_HOST, port=int(DB_PORT), user=DB_USER, 
+    id = user_id
+    groups = adminServices.login(id)
+    return render_template('admin_files/admin_groups.html', groups = groups
+        )
+#==============================================================================#
+def get_user(user):
+  #id_user = str(user[0][0])
+  #print(str(user[0][0]))
+  query = "SELECT id FROM users WHERE id=" + str(user[0][0]) + ";"
+  conn = mariadb.connect(host=DB_HOST, port=int(DB_PORT), user=DB_USER, 
         password=DB_PASSWORD, database=DB_DATABASE)
-    try:
+  try:
         cur = conn.cursor(buffered=True)
-        # get all the group names
-        cur.execute(queries[0])
-        group_names = cur.fetchall()
-
-        # get all the group names for this user
-        cur.execute(queries[1])
-        admin_groups = cur.fetchall()        
-
-        # close the connection
+        cur.execute(query)
+        users = cur.fetchall()
         cur.close()
         conn.close()
-    except mariadb.Error as error:
+  except mariadb.Error as error:
             print("Failed to read data from table", error)
-    finally:
-        if (conn):
+  finally:
+        if conn:
             conn.close()
             print('Connection to db was closed!')
 
-    # return the page with all the data stored in the groups variable which is a
-    # dictionary with {name, yes/no} pairs
-    groups = create_group_dict(group_names, admin_groups)
-    #for key, value in groups.items():
-    #    print(key + "-------" + value)
-    return render_template('admin_files/admin_groups.html', groups = groups
-        )
+  return users
 #==============================================================================#
 @app.route('/admin_add')
 def admin_add_run():

@@ -1,4 +1,6 @@
 from crypt import methods
+import imp
+from tokenize import group
 import requests
 from flask import Flask, flash, redirect, render_template, request, session, abort, flash, url_for, request, jsonify
 from passlib.hash import sha256_crypt
@@ -8,7 +10,6 @@ import operator
 import re
 from sign_up import sign_up_pers
 from global_variables import *
-import admin, user
 import numpy as np
 import plotly
 import plotly.graph_objects as go
@@ -16,27 +17,28 @@ import plotly.offline as pyo
 from plotly.offline import init_notebook_mode
 from OpenSSL import SSL
 import ssl
+from adminServices import AdminServices
 #ssl.PROTOCOL_TLSv1_2
 #context = SSL.Context(ssl.PROTOCOL_TLSv1_2)
 #context.use_privatekey_file('server.key')
 #context.use_certificate_file('server.crt')   
 #==============================================================================#
 
-@app.route('/', methods=['POST', 'GET'])
-def smth():
-    res = requests.get("http://localhost:49153/admin_home")
-    return str(res.text)
+#@app.route('/', methods=['POST', 'GET'])
+#def smth():
+#    res = requests.get("http://localhost:49153/admin_home")
+#    return str(res.text)
 
-#@app.route('/')
-#def home():
-#  if not session.get('logged_in'):
-#    return render_template("common_files/login.html")
-#  else:
-#    is_admin = is_user_admin()
-#    if is_admin:
-#      return redirect('/admin_home')
-#    else:
-#      return redirect('/user_home')
+@app.route('/')
+def home():
+  if not session.get('logged_in'):
+    return render_template("common_files/login.html")
+  else:
+    is_admin = is_user_admin()
+    if is_admin:
+      return redirect('/admin_home')
+    else:
+      return redirect('/user_home')
 
 #==============================================================================#
 
@@ -125,12 +127,54 @@ def do_admin_login():
     
   # save the username in a global variable so that you can access it from other scripts
   set_user(data[0][0])
+  print(data[0][0])
 
   # return the appropriate page
   return home()
 
 #==============================================================================#
+@app.route('/admin_groups')
+def admin_groups_run():
+    # if the user is not logged in, redirect him/her to the login page
+    is_logged_in()
+    groups = AdminServices.admin_groups(user_id[0])
+    #for key, value in groups.items():
+    #    print(key + "-------" + value)
+    return render_template('admin_files/admin_groups.html', groups = groups
+        )
+#==============================================================================#
+@app.route('/admin_home')
+def admin_home_run():
+   # if the user is not logged in, redirect him/her to the login page
+    is_logged_in()
+    app_perms_list = AdminServices.admin_home(user_id[0])
+    print("IN ADMIN_HOME")
+    print(user_id[0])
+    print(app_perms_list)
+    # return the page with all the data stored in the app_perms_list variable
+    return render_template('admin_files/admin_home.html', app_perms_list = app_perms_list)
+#==============================================================================#
+def get_user(user):
+  #id_user = str(user[0][0])
+  #print(str(user[0][0]))
+  query = "SELECT id FROM users WHERE id=" + str(user[0][0]) + ";"
+  conn = mariadb.connect(host=DB_HOST, port=int(DB_PORT), user=DB_USER, 
+        password=DB_PASSWORD, database=DB_DATABASE)
+  try:
+        cur = conn.cursor(buffered=True)
+        cur.execute(query)
+        users = cur.fetchall()
+        cur.close()
+        conn.close()
+  except mariadb.Error as error:
+            print("Failed to read data from table", error)
+  finally:
+        if conn:
+            conn.close()
+            print('Connection to db was closed!')
 
+  return users
+#==============================================================================#
 @app.route('/sign_up')
 def sign_up():
   return render_template("common_files/sign_up.html")

@@ -62,39 +62,39 @@
                   <div>
                     <img src="static/img/avatar_pi.png" alt="Avatar" >
                   </div>
-                  <div>
-                      {% for i in users %}
+                  <div>  
+                      
                       <h5 class="mb-2 text-primary" style="text-align: center; color: #2596be !important;"> Account information</h5>
                       <div class="table_div table-responsive-lg">
                         <table class="table table-borderless">
                           <tbody>
                             <tr>
                               <th > Username:</th>
-                              <td class="text"> {{i.1}}</td>
+                              <td class="text"> {{users[0]}}</td>
                             </tr>
                             <tr> 
                               <th> Full name:</th>
-                              <td> {{i.3}} </td>
+                              <td> {{users[1]}} </td>
                             </tr>
                             <tr>
                               <th> Email:</th>
-                              <td> {{i.4}}</td>
+                              <td> {{users[2]}}</td>
                             </tr>
                             <tr>
                               <th> Phone:</th>
-                              <td> {{i.5}}</td>
+                              <td> {{users[3]}}</td>
                             </tr>  
                           </tbody>
                         </table>
                     </div>
-                      {% endfor %}
+                        
                     </div>
                    
                 </div>
               </div>
             </div>
             <div class="col-xl-8 col-lg-8 col-md-12 col-sm-12 col-12">
-              <form action="{{url_for('admin_settings_update')}}" method="POST">  
+              <form action="{{url_for('user_settings_update')}}" method="POST"> 
               <div class="card h-100">
                 <div class="card-body">
                   <div class="row gutters">
@@ -153,6 +153,8 @@
                               {% endfor %}
                             {% endif %}
                           {% endwith %} 
+                         
+                        
                         <button type="submit" id="submit" name="update" class="btn button_submit" >Update</button>
                         <button type="reset" id="reset" name="cancel" class="btn btn-secondary">Cancel</button>               
                       </div>

@@ -7,7 +7,7 @@ class AdminServices:
     @staticmethod
     def admin_groups(user_id):
         admin_groups = []
-        url = "http://localhost:49156/admin_groups/" + str(user_id)
+        url = "http://localhost:49167/admin_groups/" + str(user_id)
         response = requests.request("GET", url = url)
         print("In the adminServices_admin_groups")
         print(str(response.text))
@@ -21,7 +21,7 @@ class AdminServices:
     @staticmethod
     def admin_home(user_id):
         perms_list = []
-        url = "http://localhost:49156/admin_home/" +str(user_id)
+        url = "http://localhost:49167/admin_home/" +str(user_id)
         response = requests.request("GET", url = url)
         if response:
             perms_list = response.json()

@@ -1,5 +1,6 @@
 from crypt import methods
 import imp
+from telnetlib import STATUS
 from tokenize import group
 import requests
 from flask import Flask, flash, redirect, render_template, request, session, abort, flash, url_for, request, jsonify
@@ -18,6 +19,11 @@ from plotly.offline import init_notebook_mode
 from OpenSSL import SSL
 import ssl
 from adminServices import AdminServices
+from userServices import UserServices
+import re
+import string
+import json
+import forms
 #ssl.PROTOCOL_TLSv1_2
 #context = SSL.Context(ssl.PROTOCOL_TLSv1_2)
 #context.use_privatekey_file('server.key')
@@ -127,8 +133,6 @@ def do_admin_login():
     
   # save the username in a global variable so that you can access it from other scripts
   set_user(data[0][0])
-  print(data[0][0])
-
   # return the appropriate page
   return home()
 
@@ -148,9 +152,6 @@ def admin_home_run():
    # if the user is not logged in, redirect him/her to the login page
     is_logged_in()
     app_perms_list = AdminServices.admin_home(user_id[0])
-    print("IN ADMIN_HOME")
-    print(user_id[0])
-    print(app_perms_list)
     # return the page with all the data stored in the app_perms_list variable
     return render_template('admin_files/admin_home.html', app_perms_list = app_perms_list)
 #==============================================================================#
@@ -174,6 +175,72 @@ def get_user(user):
             print('Connection to db was closed!')
 
   return users
+#==============================================================================#
+@app.route('/user_home')
+def user_home_run():
+  # if the user is not logged in, redirect him/her to the login page
+  is_logged_in()
+  app_perms_list = UserServices.user_home(user_id[0])
+  return render_template('user_files/user_home.html', app_perms_list = app_perms_list)
+#==============================================================================#
+@app.route('/user_groups')
+def user_groups_run():
+  # if the user is not logged in, redirect him/her to the login page
+  is_logged_in()
+  groups = UserServices.user_groups(user_id[0])
+  return render_template('user_files/user_groups.html', groups = groups)
+#==============================================================================#
+@app.route('/user_msg')
+def user_msg_run():
+    # if the user is not logged in, redirect him/her to the login page
+    is_logged_in()
+
+    return render_template('user_files/user_msg.html')
+#==============================================================================#
+@app.route('/user_forum')
+def user_forum_run():
+    # if the user is not logged in, redirect him/her to the login page
+    is_logged_in()
+
+    return render_template('user_files/user_forum.html')
+#==============================================================================#
+@app.route('/user_settings', methods =['POST','GET'])
+def user_settings_run():
+  is_logged_in()
+  users_final = []
+  users = UserServices.user_settings_run(user_id[0])
+  for index, row in users.iterrows():
+    users_final.append(row[0])
+
+  form = forms.SettingsUpdate(request.form)
+  users_dict = {0: users_final[1], 1: users_final[3], 2: users_final[4], 3: users_final[5]}
+  return render_template('user_files/user_settings.html', users = users_dict, STATUS = 200, form = form )
+#==============================================================================#
+@app.route('/user_settings_update', methods = ['POST'])
+def user_settings_update():
+  is_logged_in()
+ 
+  form = forms.SettingsUpdate(request.form)
+  #print(form.data)
+  #print(type(form.data))
+  
+  req = UserServices.user_settings_update(user_id[0], form)
+  #print(req.text)
+  return user_settings_run()
+#==============================================================================#
+@app.route('/user_contact')
+def user_contact_run():
+    # if the user is not logged in, redirect him/her to the login page
+    is_logged_in()
+
+    return render_template('user_files/user_contact.html')
+#==============================================================================#
+
+@app.route('/admin_add')
+def admin_add_run():
+    # if the user is not logged in, redirect him/her to the login page
+    is_logged_in()
+    return render_template('admin_files/admin_add_user.html')  
 #==============================================================================#
 @app.route('/sign_up')
 def sign_up():

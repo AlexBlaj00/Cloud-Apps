@@ -9,7 +9,7 @@ class UserServices:
     @staticmethod
     def user_home(user_id):
         perms_list = []
-        url = "http://localhost:49157/user_home/" + str(user_id)
+        url = "http://172.30.147.24:5000/user_home/" + str(user_id)
         response = requests.request("GET", url = url)
         if response:
             perms_list = response.json()
@@ -20,7 +20,7 @@ class UserServices:
     @staticmethod
     def user_groups(user_id):
         user_groups = []
-        url = "http://localhost:49157/user_groups/" + str(user_id)
+        url = "http://172.30.147.24:5000/user_groups/" + str(user_id)
         response = requests.request("GET", url = url)
         if response:
             user_groups = response.json()
@@ -30,9 +30,10 @@ class UserServices:
     
     @staticmethod
     def user_settings_run(user_id):
-        url = "http://localhost:49157/user_settings/" + str(user_id)
+        url = "http://172.30.147.24:5000/user_settings/" + str(user_id)
         response = requests.get(url)
         data = json.loads(response.text)
+        print(data)
         response.status_code == 200
         if response:
             return pd.DataFrame(data)
@@ -41,7 +42,7 @@ class UserServices:
 
     @staticmethod
     def user_settings_update(user_id, form):
-        url = "http://localhost:49157/user_settings_update/" + str(user_id)
+        url = "http://172.30.147.24:5000/user_settings_update/" + str(user_id)
         headers = {
             'Content-Type' : 'application/json'
         }

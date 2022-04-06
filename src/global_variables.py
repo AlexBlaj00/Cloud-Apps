@@ -184,3 +184,26 @@ def is_user_admin():
     return is_admin
 
 #==============================================================================#
+def check_username(username):
+    check = True
+    user_query = "SELECT username FROM users;"
+    conn = mariadb.connect(host=DB_HOST, port=int(DB_PORT), user=DB_USER, 
+        password=DB_PASSWORD, database=DB_DATABASE)
+    try:
+        cur = conn.cursor(buffered = True)
+        cur.execute(user_query)
+        user_query = cur.fetchall()
+        for i in user_query:
+            if i[0] == username:
+                check = False
+                break
+        cur.close()
+        conn.close()
+    except mariadb.Error as error:
+            print("Failed to read data from table", error)
+    finally:
+        if conn:
+            conn.close()
+            print('Connection to db was closed!')
+    
+    return check

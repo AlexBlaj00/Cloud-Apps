@@ -24,6 +24,7 @@ import re
 import string
 import json
 import forms
+
 #ssl.PROTOCOL_TLSv1_2
 #context = SSL.Context(ssl.PROTOCOL_TLSv1_2)
 #context.use_privatekey_file('server.key')
@@ -34,6 +35,7 @@ import forms
 #def smth():
 #    res = requests.get("http://localhost:49153/admin_home")
 #    return str(res.text)
+
 
 @app.route('/')
 def home():
@@ -68,7 +70,6 @@ def do_admin_login():
     cur = conn.cursor(buffered = True)
     cur.execute(query)
     query = cur.fetchall()
-    print(query)
     cur.close()
     conn.close()
   except mariadb.Error as error:
@@ -175,6 +176,207 @@ def get_user(user):
             print('Connection to db was closed!')
 
   return users
+
+#==============================================================================#
+@app.route("/admin_settings", methods = ['POST', 'GET'])
+def admin_settings_run():
+  is_logged_in()
+  users_final = []
+  users = AdminServices.admin_settings_run(user_id[0])
+
+  for index, row in users.iterrows():
+    users_final.append(row[0])
+    
+  form = forms.SettingsUpdate(request.form)
+  users_dict = {0: users_final[1], 1: users_final[3], 2: users_final[4], 3: users_final[5]}
+  return render_template("admin_files/admin_settings.html", users = users_dict, STATUS = 200, form = form)
+
+#==============================================================================#
+@app.route("/admin_settings_update", methods = ['POST'])
+def admin_settings_update():
+  is_logged_in()
+  form = forms.SettingsUpdate(request.form)
+  req = AdminServices.admin_settings_update(user_id[0], form)
+  return admin_settings_run()
+#==============================================================================#
+@app.route('/delete_user', methods = ['GET', 'POST'])
+def delete_user_run():
+    # if the user is not logged in, redirect him/her to the login page
+    is_logged_in()
+    users = AdminServices.delete_user_run() 
+    return render_template('admin_files/admin_delete_user.html', users = users.json())
+#==============================================================================#
+@app.route('/delete_user_exec', methods=['POST'])
+def execute_delete_user():
+    # get the list of ids that the admin wants to delete
+    delete = request.form.getlist('checks')
+    service = AdminServices.execute_delete_user(delete)
+    if (service.status_code == 200):
+      flash("Succesfully deleted selected users!")
+    else:
+      flash("Something went wrong, try again.")
+    return redirect("/delete_user")
+#==============================================================================#
+@app.route('/delete_group', methods = ['GET'])
+def delete_group_run():
+     is_logged_in()
+     groups = AdminServices.delete_group_run()
+     return render_template('admin_files/admin_delete_group.html', groups = groups.json())
+#==============================================================================#
+@app.route('/delete_group_exec', methods = ['POST'])
+def execute_delete_group():
+  delete = request.form.getlist('checks')
+  service = AdminServices.execute_delete_group(delete)
+  return redirect('/delete_group')
+#==============================================================================#
+@app.route('/delete_perm')
+def delete_perm_run():
+    is_logged_in()
+    perms = AdminServices.delete_perm_run()
+    return render_template('admin_files/admin_delete_perm.html', perms = perms.json())
+#==============================================================================#
+@app.route('/delete_perm_exec', methods = ['POST'])
+def execute_delete_perm():
+    delete = request.form.getlist('checks')
+    service = AdminServices.execute_delete_perm(delete)
+    return redirect('/delete_perm')
+#==============================================================================#
+@app.route('/delete_app')
+def delete_app_run():
+    is_logged_in()
+    apps = AdminServices.delete_app_run()
+    return render_template('admin_files/admin_delete_app.html', apps = apps.json())
+#==============================================================================#
+@app.route('/delete_app_exec', methods = ['POST'])
+def execute_delete_app():
+  delete = request.form.getlist('checks')
+  service = AdminServices.execute_delete_app(delete)
+  return redirect('/delete_app')
+#==============================================================================#
+@app.route('/add_user')
+def admin_add_user():
+    # if the user is not logged in, redirect him/her to the login page
+    is_logged_in()
+    groups = AdminServices.admin_add_user()
+    return render_template('admin_files/admin_add_user.html', groups = groups.json())  
+#==============================================================================#
+@app.route('/add_group', methods=['POST','GET'])
+def admin_add_group():
+    is_logged_in()
+    groups = AdminServices.getGroups()
+    users = AdminServices.getUser()
+    permissions = AdminServices.getPerms()
+    
+    return render_template('admin_files/admin_add_group.html', groups = groups, users = users, permissions = permissions)
+#==============================================================================#
+@app.route('/add_group_run', methods = ['POST'])
+def insert_groups():
+    form = forms.AddGroup(request.form)
+    users = request.form.getlist('users')
+    perms = request.form.getlist('permissions')
+    services = AdminServices.insert_groups(form, users, perms)
+    
+    return redirect('/add_group')
+#==============================================================================#
+@app.route('/submit_user', methods = ['GET', 'POST'])
+def submit_user_form():
+    groups = request.form.getlist('groups')
+    form = forms.AddUser(request.form)
+    service = AdminServices.submit_user_form(form, groups)
+    if (service.status_code == 200):
+       flash("Succesfully created user!")
+    else:
+        flash("Something went wrong, double check if password correspond, email and phone number as well!")
+    return redirect('/add_user')
+#==============================================================================#
+@app.route('/add_perms', methods = ['GET', 'POST'])
+def admin_add_perms():
+    perms = AdminServices.getAllPerms()
+    groups = AdminServices.getGroups()
+    apps = AdminServices.getAllApps()
+    return render_template('admin_files/admin_add_perm.html', perms = perms, 
+                            groups = groups, apps = apps)  
+#==============================================================================#
+@app.route('/add_perms_run', methods = ['GET', 'POST'])
+def insert_perms():
+  id_groups = request.form.getlist('groups')
+  id_apps = request.form.getlist('apps')
+  form = forms.AddPermissions(request.form)
+  service = AdminServices.insert_perms(form, id_apps, id_groups)
+
+  return redirect('/add_perms')
+#==============================================================================#
+@app.route('/add_apps')
+def add_apps_load():
+  apps = AdminServices.getApps()
+  return render_template('admin_files/admin_add_app.html', apps = apps)
+#==============================================================================#
+@app.route('/add_apps_run', methods = ['POST'])
+def insert_apps(): 
+    form = forms.AddApplication(request.form)
+    service = AdminServices.insert_apps(form)
+    return redirect('/add_apps')
+#==============================================================================#
+@app.route('/admin_modify', methods = ['POST', 'GET'])
+def admin_modify_run():
+    is_logged_in()    
+    groups = AdminServices.getGroupsMod(user_id[0])
+    perms = AdminServices.getPermsMod(user_id[0])
+    users = AdminServices.getUser()
+    apps = AdminServices.getApps()
+    
+    return render_template('admin_files/admin_modify.html', groups = groups.json(), perm = perms.json(),  users = users, apps = apps)    
+
+#==============================================================================#
+@app.route('/admin_modify_run', methods = ['POST', 'GET'])
+def admin_modify_exec():
+
+    form_group = forms.ModifyGroup(request.form)
+    form_perms = forms.ModifyPerms(request.form)
+    form_app = forms.ModifyApp(request.form)
+    form_usrGroup = forms.ModifyUserGroup(request.form)
+    form_groupPerms = forms.ModifyGroupPerms(request.form)
+
+    if (form_group.id.data != ""):
+      service = AdminServices.admin_modify_group(form_group)
+    if (form_perms.id_perm.data != ""):
+      service = AdminServices.admin_modify_perm(form_perms)
+    if (form_app.id_app.data != ""):
+      service = AdminServices.admin_modify_app(form_app)
+    if (form_usrGroup.id_user.data != ""):
+      service = AdminServices.admin_modify_usrGroup(form_usrGroup)
+    if (form_groupPerms.id_group.data != ""):
+      service = AdminServices.admin_modify_groupPerms(form_groupPerms)
+
+    return redirect('/admin_modify')
+#==============================================================================#
+@app.route('/admin_add')
+def admin_add_run():
+    # if the user is not logged in, redirect him/her to the login page
+    is_logged_in()
+
+    return render_template('admin_files/admin_add_user.html')   
+#==============================================================================#
+@app.route('/admin_msg')
+def admin_msg_run():
+    # if the user is not logged in, redirect him/her to the login page
+    is_logged_in()
+
+    return render_template('admin_files/admin_msg.html')
+#==============================================================================#
+@app.route('/admin_forum')
+def admin_forum_run():
+    # if the user is not logged in, redirect him/her to the login page
+    is_logged_in()
+
+    return render_template('admin_files/admin_forum.html')
+#==============================================================================#
+@app.route('/admin_contact')
+def admin_contact_run():
+    # if the user is not logged in, redirect him/her to the login page
+    is_logged_in()
+    
+    return render_template('admin_files/admin_contact.html')
 #==============================================================================#
 @app.route('/user_home')
 def user_home_run():
@@ -206,26 +408,25 @@ def user_forum_run():
 #==============================================================================#
 @app.route('/user_settings', methods =['POST','GET'])
 def user_settings_run():
+
   is_logged_in()
   users_final = []
   users = UserServices.user_settings_run(user_id[0])
+
   for index, row in users.iterrows():
     users_final.append(row[0])
 
   form = forms.SettingsUpdate(request.form)
   users_dict = {0: users_final[1], 1: users_final[3], 2: users_final[4], 3: users_final[5]}
+
   return render_template('user_files/user_settings.html', users = users_dict, STATUS = 200, form = form )
 #==============================================================================#
 @app.route('/user_settings_update', methods = ['POST'])
 def user_settings_update():
   is_logged_in()
- 
+
   form = forms.SettingsUpdate(request.form)
-  #print(form.data)
-  #print(type(form.data))
-  
   req = UserServices.user_settings_update(user_id[0], form)
-  #print(req.text)
   return user_settings_run()
 #==============================================================================#
 @app.route('/user_contact')
@@ -236,11 +437,6 @@ def user_contact_run():
     return render_template('user_files/user_contact.html')
 #==============================================================================#
 
-@app.route('/admin_add')
-def admin_add_run():
-    # if the user is not logged in, redirect him/her to the login page
-    is_logged_in()
-    return render_template('admin_files/admin_add_user.html')  
 #==============================================================================#
 @app.route('/sign_up')
 def sign_up():
@@ -328,10 +524,7 @@ def reset_password():
       sql = "SELECT id from users WHERE email = " + "'" + email + "'"
       cur.execute(sql)
       sql = cur.fetchone()[0]
-      print(sql)
   
-  # trimitere mail cu parola reseta temporar
-  # 
   conn.close()
   cur.close()
   return redirect("/reset")
@@ -343,7 +536,7 @@ def serve():
 if __name__ == "__main__":
   app.secret_key = os.urandom(12)
   #context = ('cert.perm', 'key.perm')
-  app.run(debug=True, host='0.0.0.0', port=5000)
+  app.run(debug=True, host='0.0.0.0', port=5001)
 
 
 #==============================================================================#

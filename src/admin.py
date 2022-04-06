@@ -744,7 +744,7 @@ def admin_add_user():
 def submit_user_form():
     #get the list of group/groups
     g = request.form.getlist('groups')
-    
+    print("IN SUBMIT USER FORM")
     l = []
     print(g)
     print('-----')
@@ -780,12 +780,16 @@ def submit_user_form():
     if len(l) == 5 and g:
         flash("Succesfully created user!")
     create_query(g, l)
+    print("in submit user form")
+    #print (create_query(g, l))
     return redirect('/add_user')
 
 #==============================================================================#
 def create_query(groups, lista):
+    print("IN CREATE QUERY GROUPS LIST")
     query = ""
     user_name = str(lista[4])
+    print(groups)
     user_query = ( "INSERT INTO users (username, password, full_name, email, " 
     "phone_number, is_admin) VALUES ( '" + user_name + "' , '" + str(lista[3])
     + "', '" + str(lista[0]) + "', '" + str(lista[1]) + "', '" + str(lista[2]) + "', ")
@@ -818,6 +822,7 @@ def create_query(groups, lista):
 
         for i in range(0,len(queries)):
             cur.execute(str(queries[i]))
+            print(queries[i])
             conn.commit()
         cur.close()
         conn.close()
@@ -828,6 +833,7 @@ def create_query(groups, lista):
             conn.close()
             print('Connection to db was closed!')
 
+    print(queries)
     return query
 
 #==============================================================================#
@@ -1302,7 +1308,7 @@ def export_data():
 @app.route('/export_data_download')
 def export_data_download():
     output = os.system("rm -rf ./static/export/*")
-    print("command output" + output)
+    #print("command output" + output)
     # Changed line below
     return send_file('./export_data.zip', as_attachment=True)
 #------------------------------------------------------------------------------#

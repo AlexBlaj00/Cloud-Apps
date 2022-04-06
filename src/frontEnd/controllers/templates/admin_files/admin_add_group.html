@@ -117,7 +117,7 @@
                   <td ><input type="text" class="form-control" name="name" placeholder="New Name"></td>
                   <td ><input type="text" class="form-control" name="description" placeholder="New Description"></td>
                   <td style="z-index: 0;">
-                        <div class="form-group"> <!-- style="overflow-y: scroll !important; z-index: 2;"> -->
+                        <div class="form-group" aria-required="true"> <!-- style="overflow-y: scroll !important; z-index: 2;"> -->
                             <select class="selectpicker form-control" multiple name = "users" placeholder="Choose username for a group" >
                             {% for u in users %}
                             <option value="{{ u[0] }}" name="users" class="form-control"> {{ u[1] }} </option>
@@ -126,7 +126,7 @@
                         </div>
                    </td>
                    <td>
-                        <div class="form-group">
+                        <div class="form-group" aria-required="true">
                             <select class="selectpicker form-control" multiple name = "permissions" placeholder="Choose perms for a group" data-container="table">
                             {% for p in permissions %}
                             <option value="{{ p[0] }}" name="perms" class="form-control"> {{ p[1] }} </option>

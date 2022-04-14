@@ -23,7 +23,7 @@ class AdminServices:
     @staticmethod
     def admin_groups(user_id):
         admin_groups = []
-        url = "http://localhost:49157/admin_groups/" + str(user_id)
+        url = "http://172.28.119.107:5000/admin_groups/" + str(user_id)
         response = requests.request("GET", url = url)
         if response:
             admin_groups = response.json()
@@ -35,7 +35,7 @@ class AdminServices:
     @staticmethod
     def admin_home(user_id):
         perms_list = []
-        url = "http://localhost:49157/admin_home/" +str(user_id)
+        url = "http://172.28.119.107:5000/admin_home/" +str(user_id)
         response = requests.request("GET", url = url)
         if response:
             perms_list = response.json()
@@ -46,7 +46,7 @@ class AdminServices:
 
     @staticmethod
     def admin_settings_run(user_id):
-        url = "http://localhost:49157/admin_settings/" + str(user_id)
+        url = "http://172.28.119.107:5000/admin_settings/" + str(user_id)
         response = requests.get(url)
         data = json.loads(response.text)
         response.status_code == 200
@@ -57,7 +57,7 @@ class AdminServices:
 
     @staticmethod
     def admin_settings_update(user_id, form):
-        url = "http://localhost:49157/admin_settings_update/" + str(user_id)
+        url = "http://172.28.119.107:5000/admin_settings_update/" + str(user_id)
         headers = {
             'Content-Type' : 'application/json'
         }
@@ -77,7 +77,7 @@ class AdminServices:
 
     @staticmethod
     def delete_user_run():
-        url = "http://localhost:49157/delete_user"
+        url = "http://172.28.119.107:5000/delete_user"
         response = requests.request('GET', url= url)
         
         response.status_code == 200
@@ -88,7 +88,7 @@ class AdminServices:
     
     @staticmethod
     def execute_delete_user(delete):
-        url = "http://localhost:49157/delete_user_exec/" 
+        url = "http://172.28.119.107:5000/delete_user_exec/" 
         for i in delete:
             url += str(i) + ","
         url = url[:-1]
@@ -102,7 +102,7 @@ class AdminServices:
             return -1
     @staticmethod
     def admin_add_user():
-        url = "http://localhost:49157/add_user"
+        url = "http://172.28.119.107:5000/add_user"
         response = requests.request('GET', url = url)
         if response:
             response.status_code == 200
@@ -112,7 +112,7 @@ class AdminServices:
     
     @staticmethod
     def submit_user_form(form, groups):
-        url = "http://localhost:49157/submit_user/"
+        url = "http://172.28.119.107:5000/submit_user/"
         for i in groups:
             url += str(i) + ","
         url = url[:-1]
@@ -136,7 +136,7 @@ class AdminServices:
 
     @staticmethod
     def getUser():
-        url_users = "http://localhost:49157/getUsers"
+        url_users = "http://172.28.119.107:5000/getUsers"
         users = requests.request('GET', url = url_users)
         if users:
             users.status_code == 200
@@ -146,7 +146,7 @@ class AdminServices:
     
     @staticmethod
     def getGroups():
-        url_groups = "http://localhost:49157/getGroup"
+        url_groups = "http://172.28.119.107:5000/getGroup"
         groups = requests.request('GET', url = url_groups)
         if groups:
             groups.status_code == 200
@@ -156,7 +156,7 @@ class AdminServices:
 
     @staticmethod
     def getPerms():
-        url_permissions = "http://localhost:49157/getPermissions"
+        url_permissions = "http://172.28.119.107:5000/getPermissions"
         permissions = requests.request('GET', url = url_permissions)
         if permissions:
             permissions.status_code == 200
@@ -166,7 +166,7 @@ class AdminServices:
 
     @staticmethod
     def getAllPerms():
-        url_permissions = "http://localhost:49157/getAllPermissions"
+        url_permissions = "http://172.28.119.107:5000/getAllPermissions"
         permissions = requests.request('GET', url = url_permissions)
         if permissions:
             permissions.status_code == 200
@@ -176,7 +176,7 @@ class AdminServices:
 
     @staticmethod
     def getAllApps():
-        url = "http://localhost:49157/getApps"
+        url = "http://172.28.119.107:5000/getApps"
         apps = requests.request('GET', url = url)
         if apps:
             apps.status_code == 200
@@ -186,7 +186,7 @@ class AdminServices:
 
     @staticmethod
     def getApps():
-        url = "http://localhost:49157/getAllApps"
+        url = "http://172.28.119.107:5000/getAllApps"
         apps = requests.request('GET', url = url)
         if apps:
             apps.status_code == 200
@@ -196,7 +196,7 @@ class AdminServices:
 
     @staticmethod
     def insert_groups(form, users, permission):
-        url = "http://localhost:49157/add_group_run/"
+        url = "http://172.28.119.107:5000/add_group_run/"
         for i in users:
             url += str(i) + ","
         url = url[:-1]
@@ -221,7 +221,7 @@ class AdminServices:
 
     @staticmethod
     def insert_perms(form, perms, groups):
-        url = "http://localhost:49157/add_perms_run/"
+        url = "http://172.28.119.107:5000/add_perms_run/"
         for i in groups:
             url += str(i) + ","
         url = url[:-1]
@@ -245,7 +245,7 @@ class AdminServices:
 
     @staticmethod
     def insert_apps(form):
-        url = "http://localhost:49157/add_apps_run"
+        url = "http://172.28.119.107:5000/add_apps_run"
 
         headers = {
             'Content-Type' : 'application/json'
@@ -263,7 +263,7 @@ class AdminServices:
 
     @staticmethod
     def delete_group_run():
-        url = "http://localhost:49157/delete_group"
+        url = "http://172.28.119.107:5000/delete_group"
 
         response = requests.request('GET', url = url)
         if response:
@@ -273,7 +273,7 @@ class AdminServices:
             return -1
     @staticmethod
     def execute_delete_group(delete):
-        url = "http://localhost:49157/delete_group_exec/"
+        url = "http://172.28.119.107:5000/delete_group_exec/"
         for i in delete:
             url += str(i) + ","
         url = url[:-1]
@@ -286,7 +286,7 @@ class AdminServices:
 
     @staticmethod
     def delete_perm_run():
-        url = "http://localhost:49157/delete_perm"
+        url = "http://172.28.119.107:5000/delete_perm"
         response = requests.request('GET', url = url)
         if response:
             response.status_code == 200
@@ -296,7 +296,7 @@ class AdminServices:
 
     @staticmethod
     def execute_delete_perm(delete):
-        url = "http://localhost:49157/delete_perm_exec/"
+        url = "http://172.28.119.107:5000/delete_perm_exec/"
         for i in delete:
             url += str(i) + ","
         url = url[:-1]
@@ -309,7 +309,7 @@ class AdminServices:
 
     @staticmethod
     def delete_app_run():
-        url = "http://localhost:49157/delete_app"
+        url = "http://172.28.119.107:5000/delete_app"
         response = requests.request('GET', url = url)
         if response:
             response.status_code == 200
@@ -319,7 +319,7 @@ class AdminServices:
 
     @staticmethod
     def execute_delete_app(delete):
-        url = "http://localhost:49157/delete_app_exec/"
+        url = "http://172.28.119.107:5000/delete_app_exec/"
         for i in delete:
             url += str(i) + ","
 
@@ -333,7 +333,7 @@ class AdminServices:
 
     @staticmethod
     def getGroupsMod(user_id):
-        url = "http://localhost:49157/admin_group_modify/" + str(user_id)
+        url = "http://172.28.119.107:5000/admin_group_modify/" + str(user_id)
         response = requests.get(url)
         if response:
             response.status_code == 200
@@ -343,7 +343,7 @@ class AdminServices:
 
     @staticmethod
     def getPermsMod(user_id):
-        url = "http://localhost:49157/admin_perms_modify/" + str(user_id)
+        url = "http://172.28.119.107:5000/admin_perms_modify/" + str(user_id)
         response = requests.get(url)
         if response:
             response.status_code == 200
@@ -353,7 +353,7 @@ class AdminServices:
 
     @staticmethod
     def admin_modify_group(form):
-        url = "http://localhost:49157/admin_modify"
+        url = "http://172.28.119.107:5000/admin_modify"
         headers = {
             'Content-Type' : 'application/json'
         }
@@ -369,7 +369,7 @@ class AdminServices:
             return True
     @staticmethod
     def admin_modify_perm(form):        
-        url = "http://localhost:49157/admin_modify"
+        url = "http://172.28.119.107:5000/admin_modify"
         headers = {
             'Content-Type' : 'application/json'
         }
@@ -387,7 +387,7 @@ class AdminServices:
     @staticmethod
     def admin_modify_app(form):
 
-        url = "http://localhost:49157/admin_modify"
+        url = "http://172.28.119.107:5000/admin_modify"
         headers = {
             'Content-Type' : 'application/json'
         }   
@@ -403,7 +403,7 @@ class AdminServices:
         return True    
     @staticmethod
     def admin_modify_usrGroup(form):
-        url = "http://localhost:49157/admin_modify"
+        url = "http://172.28.119.107:5000/admin_modify"
         headers = {
             'Content-Type' : 'application/json'
         }
@@ -421,7 +421,7 @@ class AdminServices:
     @staticmethod
     def admin_modify_groupPerms(form):
 
-        url = "http://localhost:49157/admin_modify"
+        url = "http://172.28.119.107:5000/admin_modify"
         headers = {
             'Content-Type' : 'application/json'
         }    

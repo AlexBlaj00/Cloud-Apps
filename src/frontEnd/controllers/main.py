@@ -16,27 +16,21 @@ import plotly
 import plotly.graph_objects as go
 import plotly.offline as pyo
 from plotly.offline import init_notebook_mode
-from OpenSSL import SSL
-import ssl
 from adminServices import AdminServices
 from userServices import UserServices
 import re
 import string
 import json
 import forms
-
+import pandas as pd
+import csv, io, time, zipfile, os
+from os.path import basename
+from zipfile import ZipFile
 #ssl.PROTOCOL_TLSv1_2
 #context = SSL.Context(ssl.PROTOCOL_TLSv1_2)
 #context.use_privatekey_file('server.key')
 #context.use_certificate_file('server.crt')   
 #==============================================================================#
-
-#@app.route('/', methods=['POST', 'GET'])
-#def smth():
-#    res = requests.get("http://localhost:49153/admin_home")
-#    return str(res.text)
-
-
 @app.route('/')
 def home():
   if not session.get('logged_in'):
@@ -258,7 +252,8 @@ def admin_add_user():
     # if the user is not logged in, redirect him/her to the login page
     is_logged_in()
     groups = AdminServices.admin_add_user()
-    return render_template('admin_files/admin_add_user.html', groups = groups.json())  
+    print(groups)
+    return render_template('admin_files/admin_add_user.html', groups = groups)  
 #==============================================================================#
 @app.route('/add_group', methods=['POST','GET'])
 def admin_add_group():
@@ -350,6 +345,16 @@ def admin_modify_exec():
 
     return redirect('/admin_modify')
 #==============================================================================#
+@app.route('/admin_dashboard', methods = ['GET', 'POST'])
+def do_dashboard():
+    graphJSON = AdminServices.do_dashboard1()
+    graphJSON2 = AdminServices.do_dashboard2()
+    graphJSON3 = AdminServices.do_dashboard3()
+    print("IN admin dashboard")
+    
+    return render_template('admin_files/admin_dashboard.html', 
+        graphJSON = graphJSON2.json(), graphJSON2=graphJSON.json(), graphJSON3 = graphJSON3.json())
+#==============================================================================#
 @app.route('/admin_add')
 def admin_add_run():
     # if the user is not logged in, redirect him/her to the login page
@@ -436,7 +441,259 @@ def user_contact_run():
 
     return render_template('user_files/user_contact.html')
 #==============================================================================#
+@app.route('/import_export')
+@app.route('/import_export/<b>')
+def imp_exp_load(b = ''):
+    return render_template('admin_files/admin_imp_exp.html', button = b)
+#------------------------------------------------------------------------------#
+def zipFilesInDir(dirName, zipFileName, filter):
+   # create a ZipFile object
+   with ZipFile(zipFileName, 'w') as zipObj:
+       # Iterate over all the files in directory
+       for folderName, subfolders, filenames in os.walk(dirName):
+           for filename in filenames:
+               if filter(filename):
+                   # create complete filepath of file in directory
+                   filePath = os.path.join(folderName, filename)
+                   # Add file to zip
+                   zipObj.write(filePath, basename(filePath))
+#------------------------------------------------------------------------------#
+@app.route('/export_data_run', methods=['POST'])
+def export_data():
+    # Table headers
+    USERS_HEADER = ['id', 'username', 'password', 'full_name', 'email', 
+                    'phone_number', 'is_admin']
+    GROUPS_HEADER = ['id', 'name', 'description']
+    PERMS_HEADER = ['id', 'name', 'description', 'app_id']
+    APPS_HEADER = ['id', 'name', 'link']
+    USERS_GROUPS_HEADER = ['id', 'user_id', 'group_id']
+    APPS_PERMS_HEADER = ['id', 'group_id', 'perm_id']
 
+    # download button
+    b = ''
+
+    # get the list of objects that the admin wants to export
+    export = request.form.getlist('checks_exp')
+
+    if export:
+        # if it's not empty, then run the queries
+        conn = mariadb.connect(host=DB_HOST, user=DB_USER, password=DB_PASSWORD,
+            database=DB_DATABASE, port=DB_PORT)
+        query = 'SELECT * FROM '
+        try:
+            cur = conn.cursor(buffered = True)
+            for table in export:
+                print("table name: " + table)
+                tmp_query = query + table + ';'
+                print("Query: " + tmp_query)
+                cur.execute(tmp_query)
+                table_data = cur.fetchall()                
+                print(table_data)
+                if table == 'users':
+                    with open('./static/export/users.csv', 'w+') as file:
+                        writer = csv.writer(file)
+                        writer.writerow(USERS_HEADER)
+                        writer.writerows(table_data)
+                        print('-----users')
+                elif table == 'groups':
+                    with open('./static/export/groups.csv', 'w+') as file:
+                        writer = csv.writer(file)
+                        writer.writerow(GROUPS_HEADER)
+                        writer.writerows(table_data)
+                        print('-----groups')
+                elif table == 'permissions':
+                    with open('./static/export/permissions.csv', 'w+') as file:
+                        writer = csv.writer(file)
+                        writer.writerow(PERMS_HEADER)
+                        writer.writerows(table_data)
+                        print('-----perms')
+                elif table == 'apps':
+                    with open('./static/export/apps.csv', 'w+') as file:
+                        writer = csv.writer(file)
+                        writer.writerow(APPS_HEADER)
+                        writer.writerows(table_data)
+                        print('-----apps')
+                elif table == 'user_groups_relation':
+                    with open('./static/export/user_groups_relation.csv', 'w+') as file:
+                        writer = csv.writer(file)
+                        writer.writerow(USERS_GROUPS_HEADER)
+                        writer.writerows(table_data)
+                        print('-----u_g_rel')
+                elif table == 'group_perm_relation':
+                    with open('./static/export/group_perm_relation.csv', 'w+') as file:
+                        writer = csv.writer(file)
+                        writer.writerow(APPS_PERMS_HEADER)
+                        writer.writerows(table_data)     
+                        print('-----g_p_rel')
+            cur.close()
+            conn.close()
+        except mariadb.Error as error:
+                print("Failed to read data from table", error)
+        finally:
+            if conn:
+                conn.close()
+                print('Connection to db was closed!')
+        # create a zip archive of all the csv files
+        zipFilesInDir('./static/export', 'export_data.zip', 
+                lambda name : 'csv' in name)
+        # create download button to be inserted into page
+        b = 'show button'
+    return redirect('/import_export/{b}')
+#------------------------------------------------------------------------------#
+@app.route('/export_data_download')
+def export_data_download():
+    output = os.system("rm -rf ./static/export/*")
+    print("command output" + output)
+    # Changed line below
+    return send_file('./export_data.zip', as_attachment=True)
+#------------------------------------------------------------------------------#
+@app.route('/import_data_run', methods=['POST'])
+def import_data():
+    uploaded_file = request.files['import_csv']
+    
+    if uploaded_file.filename != '':
+        file_path = UPLOAD_FOLDER + uploaded_file.filename
+        # set the file path
+        uploaded_file.save(file_path)
+        parseCSV(file_path)
+        # save the file
+    return redirect('import_export')
+#==============================================================================#
+def parseCSV(filePath):
+    USERS_HEADER = ['id', 'username', 'password', 'full_name', 'email', 
+                    'phone_number', 'is_admin']
+    GROUPS_HEADER = ['id', 'name', 'description']
+    PERMS_HEADER = ['id', 'name', 'description', 'app_id']
+    APPS_HEADER = ['id', 'name', 'link']
+    USERS_GROUPS_HEADER = ['id', 'user_id', 'group_id']
+    APPS_PERMS_HEADER = ['id', 'group_id', 'perm_id']
+    imported = request.form.getlist('checks_imp')
+    print(str(imported))
+    
+    conn = mariadb.connect(host=DB_HOST, user=DB_USER, password=DB_PASSWORD,
+            database=DB_DATABASE, port=DB_PORT)
+   
+    
+    if str(imported[0]) == 'users':
+        csvData = pd.read_csv(filePath, names=USERS_HEADER, header=None)
+        for i, row in csvData.iterrows():
+            if row[0] == 'id':
+                continue
+            sql = "INSERT INTO users (id, username, password, full_name, email, phone_number, id_admin) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+            values = (row['id'], row['username'], row['password'], row['full_name'], row['email'], row['phone_number'], row['id_admin'])
+            try:
+                cur = conn.cursor(buffered = True)
+                cur.execute(sql, values)
+                conn.commit()
+                print(i, row['id'], row['username'], row['password'], row['full_name'], row['email'], row['phone_number'], row['id_admin'])
+                cur.close()
+                conn.close()
+            except mariadb.Error as error:
+                print("Failed to read data from table", error)
+            finally:
+                if conn:
+                    conn.close()
+                    print('Connection to db was closed!')
+    
+    elif str(imported[0]) == 'groups':
+        csvData = pd.read_csv(filePath, names=GROUPS_HEADER, header=None)
+        for i, row in csvData.iterrows():
+            if row[0] == 'id':
+                continue
+            sql = "INSERT INTO groups (id, name, description) VALUES (%s, %s, %s)"
+            values = [row['id'], row['name'], row['description']]
+            try:
+                cur = conn.cursor(buffered = True)
+                cur.execute(sql, (values))
+                conn.commit()
+                print(i, row['id'], row['name'], row['description'])
+                cur.close()
+                conn.close()
+            except mariadb.Error as error:
+                print("Failed to read data from table", error)
+            finally:
+                if conn:
+                    conn.close()
+                    print('Connection to db was closed!')
+      
+    elif str(imported[0]) == 'permissions':
+        csvData = pd.read_csv(filePath, names=PERMS_HEADER, header=None)
+        for i, row in csvData.iterrows():
+            sql = "INSERT INTO permissions (id, name, description, app_id) VALUES (%s, %s, %s, %s)"
+            values = [row['id'], row['name'], row['description'], row['app_id']]
+            try:
+                cur = conn.cursor(buffered = True)
+                cur.execute(sql, (values))
+                conn.commit()
+                print(i, row['id'], row['name'], row['description'], row['app_id'])
+                cur.close()
+                conn.close()
+            except mariadb.Error as error:
+                print("Failed to read data from table", error)
+            finally:
+                if conn:
+                    conn.close()
+                    print('Connection to db was closed!')
+    elif str(imported[0]) == 'apps':
+        csvData = pd.read_csv(filePath, names=APPS_HEADER, header=None)
+        for i, row in csvData.iterrows():
+            if row[0] == 'id':
+                continue
+            sql = "INSERT INTO apps (id, name, link) VALUES (%s, %s, %s)"
+            values = [row['id'], row['name'], row['link']]
+            try:
+                cur = conn.cursor(buffered = True)
+                cur.execute(sql, (values))
+                conn.commit()
+                print(i, row['id'], row['name'], row['link'])
+                cur.close()
+                conn.close()
+            except mariadb.Error as error:
+                print("Failed to read data from table", error)
+            finally:
+                if conn:
+                    conn.close()
+                    print('Connection to db was closed!')
+    elif str(imported[0]) == 'user_groups_relation':
+        csvData = pd.read_csv(filePath, names=USERS_GROUPS_HEADER, header=None)
+        for i, row in csvData.iterrows():
+            if row[0] == 'id':
+                continue
+            sql = "INSERT INTO user_groups_relation (id, user_id, group_id) VALUES (%s, %s, %s)"
+            values = [row['id'], row['user_id'], row['group_id']]
+            try:
+                cur = conn.cursor(buffered = True)
+                cur.execute(sql, (values))
+                conn.commit()
+                print(i, row['id'], row['user_id'], row['group_id'])
+                cur.close()
+                conn.close()
+            except mariadb.Error as error:
+                print("Failed to read data from table", error)
+            finally:
+                if conn:
+                    conn.close()
+                    print('Connection to db was closed!')
+    elif str(imported[0]) == 'group_perm_relation':
+        csvData = pd.read_csv(filePath, names=APPS_PERMS_HEADER, header=None)
+        for i, row in csvData.iterrows():
+            if row[0] == 'id':
+                continue
+            sql = "INSERT INTO group_perm_relation (id, group_id, perm_id) VALUES (%s, %s, %s)"
+            values = [row['id'], row['group_id'], row['perm_id']]
+            try:
+                cur = conn.cursor(buffered = True)
+                cur.execute(sql, (values))
+                conn.commit()
+                print(i, row['id'], row['group_id'], row['perm_id'])
+                cur.close()
+                conn.close()
+            except mariadb.Error as error:
+                print("Failed to read data from table", error)
+            finally:
+                if conn:
+                    conn.close()
+                    print('Connection to db was closed!')
 #==============================================================================#
 @app.route('/sign_up')
 def sign_up():
@@ -536,7 +793,6 @@ def serve():
 if __name__ == "__main__":
   app.secret_key = os.urandom(12)
   #context = ('cert.perm', 'key.perm')
-  app.run(debug=True, host='0.0.0.0', port=5001)
-
+  app.run(debug=True, host='0.0.0.0', port=4000)
 
 #==============================================================================#

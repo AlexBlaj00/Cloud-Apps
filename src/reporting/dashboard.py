@@ -23,6 +23,7 @@ DB_PASSWORD = 'h^g8p{66TgW'
 DB_DATABASE = 'sky_security'
 DB_PORT = 3306
 
+
 @app.route("/admin_dashboard1", methods = ['POST', 'GET'])
 def do_dasboard_apps():
     apps = "select count(*), name from apps group by name;"
@@ -51,8 +52,9 @@ def do_dasboard_apps():
             
 
     fig = go.Figure(data=[go.Pie(labels=applications, values = valuesApps)])
-
-    return fig.show()
+    graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+   
+    return graphJSON
 
 @app.route("/admin_dashboard2", methods = ['POST', 'GET'])
 def do_dashboard_perms():
@@ -67,7 +69,7 @@ def do_dashboard_perms():
         cur = conn.cursor(buffered = True)
         cur.execute(users_perms)
         users_perms = cur.fetchall()
-        #print(apps)
+        
     except mariadb.Error as error:
             print("Failed to read data from table", error)
     finally:
@@ -86,13 +88,13 @@ def do_dashboard_perms():
             else:
                 count_perms.append(el)
 
-    print("{} {}".format(permission, count_perms))
+    
     fig = px.line(x=permission, y=count_perms, 
             labels=dict(x="Permission", y="Amount", color="Time Period"))
     fig.add_bar(x=permission, y=count_perms, name="Counter")
     fig.update_layout(title_text="Multi-category axis")
-    
-    return fig.show()
+    graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+    return graphJSON
 
 
 
@@ -135,9 +137,9 @@ def do_dashboard():
     
 
     #CONVERTING A GRAPH TO A JSON GRAPH
-    graphJSON2 = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+    graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
 
-    return  fig.show() #fig2.show()
+    return  graphJSON #fig2.show()
 
 
 @app.route('/', methods=['GET'])

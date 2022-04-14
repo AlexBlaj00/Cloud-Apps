@@ -182,8 +182,6 @@ def user_settings_run():
         if conn:
             conn.close()
             print('Connection to db was closed!')
-    print('IN USER_SETTING')
-    print(query)
 
     #return settings and display user`s information (id, full_name, email, phone_number)
     return render_template('user_files/user_settings.html', users = query)

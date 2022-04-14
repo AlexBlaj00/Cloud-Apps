@@ -1,6 +1,6 @@
-from flask import Flask, jsonify
+from webbrowser import get
 import requests
-from flask import Flask, flash, redirect, render_template, request, session, abort, flash, url_for, request
+from flask import Flask, flash, redirect, render_template, request, session, abort, flash, url_for, request, jsonify
 from passlib.hash import sha256_crypt
 import mysql.connector as mariadb
 import os
@@ -15,6 +15,7 @@ import plotly.graph_objects as go
 import plotly.offline as pyo
 from plotly.offline import init_notebook_mode
 from OpenSSL import SSL
+from flask_login import current_user, login_user, logout_user, login_required
 import ssl
 #ssl.PROTOCOL_TLSv1_2
 #context = SSL.Context(ssl.PROTOCOL_TLSv1_2)
@@ -55,7 +56,7 @@ def do_admin_login():
     cur = conn.cursor(buffered = True)
     cur.execute(query)
     query = cur.fetchall()
-    print(query)
+    #print(query)
     cur.close()
     conn.close()
   except mariadb.Error as error:
@@ -121,10 +122,33 @@ def do_admin_login():
   # save the username in a global variable so that you can access it from other scripts
   set_user(data[0][0])
 
+  #id_user = get_user(data[0][0])
+  
   # return the appropriate page
   return home()
 
 #==============================================================================#
+def get_user(user):
+  #id_user = str(user[0][0])
+  #print(str(user[0][0]))
+  query = "SELECT id FROM users WHERE id=" + str(user[0][0]) + ";"
+  conn = mariadb.connect(host=DB_HOST, port=int(DB_PORT), user=DB_USER, 
+        password=DB_PASSWORD, database=DB_DATABASE)
+  try:
+        cur = conn.cursor(buffered=True)
+        cur.execute(query)
+        users = cur.fetchall()
+        cur.close()
+        conn.close()
+  except mariadb.Error as error:
+            print("Failed to read data from table", error)
+  finally:
+        if conn:
+            conn.close()
+            print('Connection to db was closed!')
+
+  return users
+
 
 @app.route('/sign_up')
 def sign_up():

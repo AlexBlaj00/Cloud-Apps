@@ -1,0 +1,24 @@
+version: '3.9'
+
+services:
+  app:
+    build: ./backEnd
+    links:
+      - database
+    ports:
+      - "5000:5000"
+
+  database:
+    image: mariadb:10.3
+    container_name: mariadb
+    volumes:
+      - /db:/docker-entrypoint-initdb.d/sky_security_dump.sql
+
+    ports:
+      - 3306:3306
+
+    environment:
+      MYSQL_DATABASE: sky_security
+      MYSQL_PASSWORD: h^g8p{66TgW
+      MYSQL_USER: sky_admin
+

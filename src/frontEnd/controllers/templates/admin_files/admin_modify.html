@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type= "text/css" href="../static/styles/index.css">
+    <link rel="stylesheet" type= "text/css" href="../static/styles/index_bg.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> <!--Link pentru sageata-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet'>
+    <script type="text/javascript" src="../../static/scripts/index.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <style>
+      .btn_submit {
+        background-color: #1e7898;
+        border: 0px solid transparent;
+        color: white;
+      }
+      .btn_submit:hover {
+        background-color: #7cc0d8;
+      }
+      .btn_submit:focus {
+        background-color: #7cc0d8;
+      }
+      thead {
+        background-color: #2596be !important; color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="topnav" id="myTopnav">
+      <div class="dropdown">
+        <button class="dropbtn">Profile  
+          <i class="fa fa-caret-down" style="text-align: right;"></i>  
+        </button>
+
+        <div class="dropdown-content">
+          <a href="/admin_settings" target="_self">Settings</a>
+          <a href="/admin_contact" target="_self">Contact</a>
+          <a href="/logout" target="_self">Log Out</a>
+        </div>
+      </div>
+      <a href="/admin_home" class="homebtn" target="_self">Home</a>
+    </div>
+    <div id="side_menu" class="sidebar">
+      <a href="javascript:void(0)" class="closebtn" onclick="close_menu()">×</a>
+      <img src="../../static/img/logo_transparent.png" class="img-logo">
+      <a href="/admin_home" target="_self">Apps</a>
+      <a href="/admin_groups" target="_self">Groups</a>
+      <button class="dropdown-side-btn">Add
+        <i class="fa fa-caret-down"></i>
+      </button>
+          <div class="dropdown-side-menu">
+              <a href="/add_user">Add users</a>
+              <a href="/add_group">Add groups</a>
+              <a href="/add_perms">Add permissions</a>
+              <a href="/add_apps">Add applications</a>
+          </div>
+      <a href="/admin_modify" target="_self">Modify</a>
+      <button class="dropdown-side-btn" id="drop-side-btn">Delete
+        <i class="fa fa-caret-down" style="text-align: right"></i>
+      </button>
+      <div class="dropdown-side-menu">
+        <a href="/delete_user" target="_self">Delete users</a>
+        <a href="/delete_group" target="_self">Delete groups</a>
+        <a href="/delete_perm" target="_self">Delete permissions</a>
+        <a href="/delete_app" target="_self">Delete applications</a>
+      </div>
+      <!--
+      <a href="/admin_msg" target="_self">Messages</a>
+      -->
+      <a href="/import_export" target="_self">Import/Export Data</a>
+      <a href="/admin_forum" target="_self">Frequent Questions</a>
+      <a href="/admin_dashboard" target="_self">Admin dashboard</a>
+    </div>
+    <div id="main">
+     
+      <button class="open_btn" onclick="open_menu()">☰</button>
+      <div class="main-container">
+        <h2>Modify</h2>
+        <p>List of options.</p>
+        <script>
+          $(document).ready(function() {
+            $('#group').click(function() {
+              $('.group').toggle();
+              $('.permission').toggle(false);
+              $('.user_group').toggle(false);
+              $('.user_perm').toggle(false);
+              $('.app').toggle(false);
+            });
+          });
+          $(document).ready(function() {
+            $('#permission').click(function() {
+              $('.permission').toggle();
+              $('.group').toggle(false);
+              $('.user_group').toggle(false);
+              $('.user_perm').toggle(false);
+              $('.app').toggle(false);
+            });
+          });
+          $(document).ready(function() {
+            $('#app').click(function() {
+              $('.app').toggle();
+              $('.permission').toggle(false);
+              $('.group').toggle(false);
+              $('.user_group').toggle(false);
+              $('.user_perm').toggle(false);
+            });
+          });
+          $(document).ready(function() {
+            $('#user_group').click(function() {
+              $('.permission').toggle(false);
+              $('.user_perm').toggle(false);
+              $('.app').toggle(false);
+              $('.group').toggle(false);
+              $('.group').toggle();
+              $('.user_group').toggle();
+            });
+          });
+          $(document).ready(function() {
+            $('#user_perm').click(function() {
+              $('.permission').toggle(false);
+              $('.user_group').toggle(false);
+              $('.app').toggle(false);
+              $('.group').toggle(false);
+              $('.group').toggle();
+              $('.user_perm').toggle();
+            });
+          });
+        </script>
+        <button  class="btn btn_submit"  id="group" >Group</button>
+        <button  class="btn btn_submit" id="permission" >Permission</button>
+        <button  class="btn btn_submit" id="app" >App</button>
+        <button  class="btn btn_submit" id="user_group" >User-Group</button>
+        <button  class="btn btn_submit" id="user_perm" >Group-Permissions</button>
+        <form action="{{url_for('admin_modify_exec')}}" method="POST" style="padding-top: 30px;">
+          <div class="group" style="display: none;"> 
+            <table class="table">
+              <thead class="thead">
+                <tr>
+                  <th scope="col" style=" border-bottom: 2px solid black !important;">#</th>
+                  <th scope="col" style=" border-bottom: 2px solid black !important;">Name</th>
+                  <th scope="col" style=" border-bottom: 2px solid black !important;">Description</th>
+                  <th scope="col" style=" border-bottom: 2px solid black !important;"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for i in groups %}
+                <tr>
+                  <th scope="row">{{i.0}}</th>
+                  <td>{{i.1}}</td>
+                  <td>{{i.2}}</td>
+                </tr>
+                {% endfor %}
+                <tr>
+                  <td><input type="number" class="form-control" name="id" placeholder="Id"></td>
+                  <td ><input type="text" class="form-control" name="name" placeholder="New Name"></td>
+                  <td ><input type="text" class="form-control" name="description" placeholder="New Description"></td>
+                  <td><button class="btn btn-secondary btn_submit" type="submit"> Run </button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="permission" style="display: none;"> 
+            <table class="table">
+              <thead class="thead">
+                <tr>
+                  <th scope="col" style=" border-bottom: 2px solid black !important;">Permission</th>
+                  <th scope="col" style=" border-bottom: 2px solid black !important;">Name</th>
+                  <th scope="col" style=" border-bottom: 2px solid black !important;">Description</th>
+                  <th scope="col" style=" border-bottom: 2px solid black !important;">App</th>
+                  <th scope="col" style=" border-bottom: 2px solid black !important;"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for i in perm %}
+                <tr>
+                  <th scope="row">{{i.0}}</th>
+                  <td>{{i.1}}</td>
+                  <td>{{i.2}}</td>
+                  <td>{{i.3}}</td>
+                </tr>
+                {% endfor %}
+                <tr>
+                  <td><input type="number" class="form-control" name="id_perm" placeholder="Id"></td>
+                  <td ><input type="text" class="form-control" name="name_perm" placeholder="New Name"></td>
+                  <td ><input type="text" class="form-control" name="desc_perm" placeholder="New Description"></td>
+                  <td ><input type="text" class="form-control" name="app" placeholder="New App"></td>
+                  <td><button class="btn btn-secondary btn_submit" type="submit"> Run </button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="app" style="display: none;"> 
+            <table class="table">
+              <thead class="thead">
+                <tr>
+                  <th scope="col" style=" border-bottom: 2px solid black !important;">App</th>
+                  <th scope="col" style=" border-bottom: 2px solid black !important;">Name</th>
+                  <th scope="col" style=" border-bottom: 2px solid black !important;">Link</th>
+                  <th scope="col" style=" border-bottom: 2px solid black !important;"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for i in apps %}
+                <tr>
+                  <th scope="row">{{i.0}}</th>
+                  <td>{{i.1}}</td>
+                  <td>{{i.2}}</td>
+                </tr>
+                {% endfor %}
+                <tr>
+                  <td><input type="number" class="form-control" name="id_app" placeholder="Id"></td>
+                  <td ><input type="text" class="form-control" name="name_app" placeholder="New Name"></td>
+                  <td ><input type="text" class="form-control" name="link" placeholder="New Link"></td>
+                  <td><button class="btn btn_submit" type="submit"> Run </button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="user_group" style="display: none;"> 
+            <table class="table">
+              <thead class="thead">
+                <tr>
+                  <th scope="col" style=" border-bottom: 2px solid black !important;">#</th>
+                  <th scope="col" style=" border-bottom: 2px solid black !important;">Name</th>
+                  <th scope="col" style=" border-bottom: 2px solid black !important;">Description</th>
+                  <th scope="col" style=" border-bottom: 2px solid black !important;"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for i in users %}
+                <tr>
+                  <th scope="row">{{i.0}}</th>
+                  <td>{{i.1}}</td>
+                </tr>
+                {% endfor %}
+                <tr>
+                  <td><input type="number" class="form-control" name="id_user" placeholder="Id"></td>
+                  <td ><input type="text" class="form-control" name="add_group" placeholder="Add Group Id"></td>
+                  <td ><input type="text" class="form-control" name="remove_group" placeholder="Remove Group Id"></td>
+                  <td><button class="btn btn_submit" type="submit"> Run </button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="user_perm" style="display: none;"> 
+            <table class="table">
+              <thead class="thead">
+                <tr>
+                  <th scope="col" style=" border-bottom: 2px solid black !important;">#</th>
+                  <th scope="col" style=" border-bottom: 2px solid black !important;">Name</th>
+                  <th scope="col" style=" border-bottom: 2px solid black !important;"></th>
+                  <th scope="col" style=" border-bottom: 2px solid black !important;"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for i in perm %}
+                <tr>
+                  <th scope="row">{{i.0}}</th>
+                  <td>{{i.1}}</td>
+                </tr>
+                {% endfor %}
+                <tr>
+                  <td><input type="number" class="form-control" name="id_group" placeholder="Id Group"></td>
+                  <td ><input type="text" class="form-control" name="add_perm" placeholder="Add Permission Id"></td>
+                  <td ><input type="text" class="form-control" name="remove_perm" placeholder="Remove Permission Id"></td>
+                  <td><button class="btn btn_submit" type="submit"> Run </button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </form>
+      </div>
+      
+    </div>
+    <script>
+      var dropdown = document.getElementsByClassName("dropdown-side-btn");
+      var i;
+    
+      for (i = 0; i < dropdown.length; i++) {
+      dropdown[i].addEventListener("click", function() {
+      this.classList.toggle("active");
+      var dropdownContent = this.nextElementSibling;
+      if (dropdownContent.style.display === "block") {
+      dropdownContent.style.display = "none";
+      } else {
+      dropdownContent.style.display = "block";
+      }
+      });
+      }
+     </script>
+
+      
+  </body>
+</html>

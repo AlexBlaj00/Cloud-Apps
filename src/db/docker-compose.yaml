@@ -1,0 +1,16 @@
+version: '3.7'
+
+services:
+  mariadb:
+    image: mariadb
+    restart: always
+    environment:
+      MARIADB_DATABASE: sky_security
+      MARIADB_PASSWORD: h^g8p{66TgW
+      MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: Yes
+      MARIADB_USER: sky_admin
+    volumes:
+      -  ./:/docker-entrypoint-initdb.d/sky_security_dump.sql
+      -  /var/lib/mysql
+    ports:
+      - 3306:3306

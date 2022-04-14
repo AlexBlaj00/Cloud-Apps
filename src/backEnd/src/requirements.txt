@@ -1,0 +1,7 @@
+Flask
+mysql
+passlib
+mariadb
+flask_restful
+mysql-connector
+make_response

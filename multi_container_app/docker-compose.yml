@@ -1,0 +1,28 @@
+version: '3.1'
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - '8080:8080'
+    volumes:
+      - ./backend:/app
+    command: ['python', 'main.py']
+
+  frontend:
+    build: ./frontend
+    ports:
+      - '3000:3000'
+    command: ['npm', 'start']
+
+  database:
+    image: postgis/postgis
+    ports: 
+      - '5444:5432'
+    environment:
+      POSTGRES_PASSWORD: passw0rd
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+   
+volumes:
+  pgdata:

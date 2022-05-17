@@ -1,24 +1,35 @@
 version: '3.9'
 
+networks:
+  micro_network:
+    external:
+      name: micro_network
+
 services:
-  app:
+  backend:
+    container_name: backend-container
     build: ./backEnd
-    links:
-      - database
     ports:
       - "5000:5000"
-
-  database:
-    image: mariadb:10.3
-    container_name: mariadb
-    volumes:
-      - /db:/docker-entrypoint-initdb.d/sky_security_dump.sql
-
+    networks:
+      - micro_network 
+    restart: always
+    
+  frontend:
+    container_name: frontend-container
+    build: ./frontEnd
     ports:
-      - 3306:3306
+      - "4000:4000"
+    networks:
+      - micro_network    
+    restart: always
 
-    environment:
-      MYSQL_DATABASE: sky_security
-      MYSQL_PASSWORD: h^g8p{66TgW
-      MYSQL_USER: sky_admin
+  reporting:
+    container_name: reporting-container
+    build: ./reporting
+    ports:
+      - "5003:5003"
+    networks:
+      - micro_network    
+    restart: always
 

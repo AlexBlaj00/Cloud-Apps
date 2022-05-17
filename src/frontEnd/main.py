@@ -252,8 +252,7 @@ def admin_add_user():
     # if the user is not logged in, redirect him/her to the login page
     is_logged_in()
     groups = AdminServices.admin_add_user()
-    print(groups)
-    return render_template('admin_files/admin_add_user.html', groups = groups)  
+    return render_template('admin_files/admin_add_user.html', groups = groups.json())  
 #==============================================================================#
 @app.route('/add_group', methods=['POST','GET'])
 def admin_add_group():
@@ -793,6 +792,6 @@ def serve():
 if __name__ == "__main__":
   app.secret_key = os.urandom(12)
   #context = ('cert.perm', 'key.perm')
-  app.run(debug=True, host='0.0.0.0', port=4000)
+  app.run(debug=True, host='frontEnd', port=4000)
 
 #==============================================================================#

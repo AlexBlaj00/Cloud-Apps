@@ -1,0 +1,47 @@
+{
+    "AWSEBDockerrunVersion": 2,
+    "containerDefinitions" : [
+        {
+            "name" : "frontEnd",
+            "image" : "alexblaj/cloudappv1_frontend" ,
+            "hostname" : "frontend",
+            "essential" : true,
+            "portMappings" : [
+                {
+                    "hostPort" : "4000",
+                    "containerPort" : "4000"
+                }
+            ],
+            "memory" : 300,
+            "cpu" : 10
+        },
+        {
+            "name" : "backEnd",
+            "image" : "alexblaj/cloudappv1_backend" ,
+            "hostname" : "backEnd",
+            "essential" : true,
+            "portMappings" : [
+                {
+                    "hostPort" : "5000",
+                    "containerPort" : "5000"
+                }
+            ],
+            "memory" : 500,
+            "cpu" : 10
+        },
+        {
+            "name" : "reporting",
+            "image" : "alexblaj/cloudappv1_reporting" ,
+            "hostname" : "reporting",
+            "essential" : true,
+            "portMappings" : [
+                {
+                    "hostPort" : "5003",
+                    "containerPort" : "5003"
+                }
+            ],
+            "memory" : 300,
+            "cpu" : 10
+        }
+    ]
+}

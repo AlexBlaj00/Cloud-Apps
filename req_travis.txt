@@ -1,0 +1,10 @@
+mysql-connector
+Flask
+mysql
+make_response
+requests
+flask_wtf
+passlib
+flask_restful
+plotly
+plotly.express

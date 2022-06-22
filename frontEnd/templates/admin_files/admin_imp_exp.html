@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type= "text/css" href="../static/styles/index.css">
+    <link rel="stylesheet" type= "text/css" href="../static/styles/index_bg.css">
+    <link rel="stylesheet" type= "text/css" href="../../static/styles/delete.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> <!--Link pentru sageata-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet'>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <script type="text/javascript" src="../../static/scripts/index.js"></script>
+    <title> Import/Export Data</title>
+  </head>
+
+  <body>
+
+    <div class="topnav" id="myTopnav">
+
+      <div class="dropdown">
+        <button class="dropbtn">Profile  
+          <i class="fa fa-caret-down" style="text-align: right;"></i>  
+        </button>
+
+        <div class="dropdown-content">
+            <a href="/admin_settings" target="_self">Settings</a>
+            <a href="/admin_contact" target="_self">Contact</a>
+            <a href="/logout" target="_self">Log Out</a>
+  
+          </div>
+        </div>
+        <a href="/admin_home" class="homebtn" target="_self">Home</a>
+      </div>
+      <div id="side_menu" class="sidebar">
+        <a href="javascript:void(0)" class="closebtn" onclick="close_menu()">×</a>
+        <img src="../../static/img/logo_transparent.png" class="img-logo">
+        <a href="/admin_home" target="_self">Apps</a>
+        <a href="/admin_groups" target="_self">Groups</a>
+        <button class="dropdown-side-btn">Add
+          <i class="fa fa-caret-down"></i>
+        </button>
+            <div class="dropdown-side-menu">
+                <a href="/add_user">Add users</a>
+                <a href="/add_group">Add groups</a>
+                <a href="/add_perms">Add permissions</a>
+                <a href="/add_apps">Add applications</a>
+            </div>
+        <a href="/admin_modify" target="_self">Modify</a>
+        <button class="dropdown-side-btn" id="drop-side-btn">Delete
+          <i class="fa fa-caret-down" style="text-align: right"></i>
+        </button>
+        <div class="dropdown-side-menu">
+          <a href="/delete_user" target="_self">Delete users</a>
+          <a href="/delete_group" target="_self">Delete groups</a>
+          <a href="/delete_perm" target="_self">Delete permissions</a>
+          <a href="/delete_app" target="_self">Delete applications</a>
+        </div>
+       
+        <a href="/import_export" target="_self">Import/Export Data</a>
+        <a href="/admin_forum" target="_self">Frequent Questions</a>
+        <a href="/admin_dashboard" target="_self">Admin dashboard</a>
+      </div>
+    </div>
+
+    <div id="main" >
+      <button class="open_btn" onclick="open_menu()">☰</button>
+      <div class="main-container" style="padding-left: 100px; padding-top: 100px;">
+        <div class="card" >
+          <div class="card-body">
+            <h2 class="card-title"> Export data</h2>
+            <br>
+            <h4 class="card-subtitle mb-2 text-muted"> Choose which data to export:</h4>
+            <br>
+            <div class="table-responsive">
+              <form action="{{ url_for('export_data') }}" method="post">
+                <table class="table table-bordered" style="border:1px solid #dee2e6 !important;">
+                  <tbody>
+                    <tr>
+                      <td><input type="checkbox" value="users" name="checks_exp">       Users</td>
+                      <td><input type="checkbox" value="groups" name="checks_exp">       Groups</td>
+                      <td><input type="checkbox" value="permissions" name="checks_exp">       Permissions</td>
+                      <td><input type="checkbox" value="apps" name="checks_exp">       Apps</td>
+                      <td><input type="checkbox" value="user_groups_relation" name="checks_exp">       Users-Groups Table</td>
+                      <td><input type="checkbox" value="groups_perm_relation" name="checks_exp">       Groups-Permissions Table</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="button_rows" style="float: right; ">
+                  <button type="submit" class="btn btn_submit">Export selected data</button>
+                  <button type="reset" class="btn btn-secondary">Clear selection</button>
+                </div>
+              </form>
+
+              {% block content %}
+                {% if button|length %}
+                  <div class="button_rows" >
+                    <button class="btn btn_submit"><a href="{{ url_for('export_data_download') }}" class='btn_submit' style="text-decoration: none;">Download data</a></button>
+                  </div>
+                {% endif %}
+              {% endblock %}
+            
+            </div>
+          </div>
+        </div>
+        <br><br><br>
+        <div class="card" >
+          <div class="card-body">
+            <h2 class="card-title"> Import data</h2>
+            <br>
+            <h4 class="card-subtitle mb-2 text-muted"> Choose which data to import:</h4>
+            <br>
+            <div class="table-responsive">
+              <form name='import' id='import' action="{{ url_for('import_data') }}" method="POST" enctype="multipart/form-data">
+                <table class="table table-bordered" style="border:1px solid #dee2e6 !important;">
+                  <tbody>
+                    <tr>
+                      <td><input type="checkbox" value="users" name="checks_imp">       Users</td>
+                      <td><input type="checkbox" value="groups" name="checks_imp">       Groups</td>
+                      <td><input type="checkbox" value="permissions" name="checks_imp">       Permissions</td>
+                      <td><input type="checkbox" value="apps" name="checks_imp">       Apps</td>
+                      <td><input type="checkbox" value="user_groups_relation" name="checks_imp">       Users-Groups Table</td>
+                      <td><input type="checkbox" value="group_perm_relation" name="checks_imp">       Groups-Permissions Table</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="button_rows" style="float: right;">
+                  <input type="submit" class="btn btn_submit"></button>
+                  <button type="reset" class="btn btn-secondary">Clear selection</button>
+                </div>
+                <div class="button_rows">
+                  <input type="file" id="import_csv" name="import_csv">
+                </div>
+              </form>
+            </div>    
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <script>
+      var dropdown = document.getElementsByClassName("dropdown-side-btn");
+      var i;
+    
+      for (i = 0; i < dropdown.length; i++) {
+      dropdown[i].addEventListener("click", function() {
+      this.classList.toggle("active");
+      var dropdownContent = this.nextElementSibling;
+      if (dropdownContent.style.display === "block") {
+      dropdownContent.style.display = "none";
+      } else {
+      dropdownContent.style.display = "block";
+      }
+      });
+      }
+     </script>
+  </body>
+</html>

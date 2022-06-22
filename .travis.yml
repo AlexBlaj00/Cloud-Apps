@@ -1,0 +1,36 @@
+sudo: required
+
+language: python
+
+services:
+  - docker
+
+before_install:
+  - pip install -r req_travis.txt
+  - docker build -t alexblaj/cloudappv1_frontend . -f ./frontEnd/Dockerfile #./fronEnd
+  - docker build -t alexblaj/cloudappv1_backend . -f ./backEnd/Dockerfile #./backEnd
+  - docker build -t alexblaj/cloudappv1_reporting . -f ./reporting/Dockerfile #./reporting
+
+script: 
+  - docker image ls
+  #- docker-compose build
+
+after_succes:
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  - docker push alexblaj/cloudappv1_frontend
+  - docker push alexblaj/cloudappv1_backend
+  - docker push alexblaj/cloudappv1_reporting
+
+deploy:
+  provider: elasticbeanstalk
+  region: eu-central-1
+  app: cloudappv1
+  env: Cloudappv1-env
+  acces_key_id: $AWS_ACCESS_KEY
+  secret_access_key: "$AWS_SECRET_KEY"
+  bucket_name : elasticbeanstalk-eu-central-1-457216790966
+  bucket_path : cloudappv1
+  on:
+    branch: master
+#after_deploy:
+#  - ./star.sh
